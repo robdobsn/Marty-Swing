@@ -12,7 +12,7 @@ with open("martySwingAndTime.txt", "w+") as swingData:
 
     # Collect data for a fixed time
     timeStart = datetime.now()
-    while (datetime.now() - timeStart).total_seconds() < 20:
+    while (datetime.now() - timeStart).total_seconds() < 60:
 
         # Get the information about Marty's swing
         xAcc = myMarty.get_accelerometer('x')
