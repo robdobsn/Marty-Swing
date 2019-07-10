@@ -1,6 +1,7 @@
 # Rhino files
 *.rhl
 *.3dmbak
+*.stlbak
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
