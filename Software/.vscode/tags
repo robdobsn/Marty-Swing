@@ -1,0 +1,136 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/4469642a/
+FreeSwing.py	..\\Step 1 Free Swing\\FreeSwing.py	1;"	kind:file	line:1
+MartySwingEnv	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	/^class MartySwingEnv(gym.Env):$/;"	kind:class	line:8
+MartySwingPeriodTracker	..\\Step 3 Track Swing\\TrackSwingPeriod.py	/^class MartySwingPeriodTracker:$/;"	kind:class	line:1
+MartySwingTracker	..\\Step 4 Predict Swing\\TrackSwingAndPredict.py	/^class MartySwingTracker:$/;"	kind:class	line:3
+MartySwingTracker	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^class MartySwingTracker:$/;"	kind:class	line:3
+PowerSwing.py	..\\Step 8 Power Swing\\PowerSwing.py	1;"	kind:file	line:1
+RecordSwing.py	..\\Step 2 Record Swing\\RecordSwing.py	1;"	kind:file	line:1
+RecordSwingWithTime.py	..\\Step 2 Record Swing\\RecordSwingWithTime.py	1;"	kind:file	line:1
+TrackSwingAndPredict.py	..\\Step 4 Predict Swing\\TrackSwingAndPredict.py	1;"	kind:file	line:1
+TrackSwingAndPredictFiltered.py	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	1;"	kind:file	line:1
+TrackSwingPeriod.py	..\\Step 3 Track Swing\\TrackSwingPeriod.py	1;"	kind:file	line:1
+__init__	..\\Step 3 Track Swing\\TrackSwingPeriod.py	/^    def __init__(self, estimatePeriodSecs):$/;"	kind:member	line:2
+__init__	..\\Step 4 Predict Swing\\TrackSwingAndPredict.py	/^    def __init__(self, estimatedPeriodSecs, estimatedStartAmplitude):$/;"	kind:member	line:4
+__init__	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^    def __init__(self, estimatedPeriodSecs, estimatedStartAmplitude):$/;"	kind:member	line:4
+__init__	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	/^    def __init__(self, g=9.81, l1=0.45, l2=0.42, m=0.3, thetaInitDeg=30, vInitial=0):$/;"	kind:member	line:14
+__init__.py	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\__init__.py	1;"	kind:file	line:1
+__init__.py	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\__init__.py	1;"	kind:file	line:1
+_get_obs	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	/^    def _get_obs(self):$/;"	kind:member	line:126
+accX	..\\Step 8 Power Swing\\PowerSwing.py	/^    accX = myMarty.get_accelerometer('x')$/;"	kind:variable	line:32
+accXAvg	..\\Step 8 Power Swing\\PowerSwing.py	/^            accXAvg = accXSum \/ smoothWindowLength$/;"	kind:variable	line:46
+accXSum	..\\Step 8 Power Swing\\PowerSwing.py	/^            accXSum = 0$/;"	kind:variable	line:43
+black	..\\Step 1 Free Swing\\FreeSwing.py	/^black = (0,0,0)$/;"	kind:variable	line:17
+black	..\\Step 8 Power Swing\\PowerSwing.py	/^black = (0,0,0)$/;"	kind:variable	line:17
+calcKineticEnergy	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	/^    def calcKineticEnergy(self, v):$/;"	kind:member	line:71
+calcPotentialEnergy	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	/^    def calcPotentialEnergy(self, theta):$/;"	kind:member	line:62
+calcThetaFromPotentialE	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	/^    def calcThetaFromPotentialE(self, potentialE, theta):$/;"	kind:member	line:65
+calcVFromKineticE	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	/^    def calcVFromKineticE(self, kineticE, theta):$/;"	kind:member	line:74
+close	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	/^    def close(self):$/;"	kind:member	line:192
+delayedValue	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^        predictedValue, filteredValue, delayedValue = swingTracker.newData(timeSecs, xAcc)$/;"	kind:variable	line:154
+done	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	/^        observation, reward, done, info = env.step(nextAction)$/;"	kind:variable	line:21
+elapsedSecs	..\\Step 2 Record Swing\\RecordSwingWithTime.py	/^            elapsedSecs = (datetime.now() - timeStart).total_seconds()$/;"	kind:variable	line:22
+env	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	/^env = gym.make('martyswing-v0')$/;"	kind:variable	line:7
+filterSample	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^    def filterSample(self, inWin, outWin):$/;"	kind:member	line:58
+filterSetup	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^    def filterSetup(self):$/;"	kind:member	line:31
+filteredValue	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^        predictedValue, filteredValue, delayedValue = swingTracker.newData(timeSecs, xAcc)$/;"	kind:variable	line:154
+getExpected	..\\Step 4 Predict Swing\\TrackSwingAndPredict.py	/^    def getExpected(self, timeSecs):$/;"	kind:member	line:49
+getExpected	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^    def getExpected(self, timeSecs):$/;"	kind:member	line:84
+getPeriod	..\\Step 3 Track Swing\\TrackSwingPeriod.py	/^    def getPeriod(self):$/;"	kind:member	line:28
+info	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	/^        observation, reward, done, info = env.step(nextAction)$/;"	kind:variable	line:21
+isPeakOrNadir	..\\Step 4 Predict Swing\\TrackSwingAndPredict.py	/^    def isPeakOrNadir(self):$/;"	kind:member	line:29
+isPeakOrNadir	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^    def isPeakOrNadir(self, testValues):$/;"	kind:member	line:64
+ke	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	/^ke = []$/;"	kind:variable	line:10
+lastAccX	..\\Step 8 Power Swing\\PowerSwing.py	/^    lastAccX = accX$/;"	kind:variable	line:71
+lastAccX	..\\Step 8 Power Swing\\PowerSwing.py	/^lastAccX = None$/;"	kind:variable	line:21
+lastAccXAvg	..\\Step 8 Power Swing\\PowerSwing.py	/^            lastAccXAvg = accXAvg$/;"	kind:variable	line:68
+lastAccXAvg	..\\Step 8 Power Swing\\PowerSwing.py	/^lastAccXAvg = 0$/;"	kind:variable	line:22
+lastAccXDiff	..\\Step 8 Power Swing\\PowerSwing.py	/^            lastAccXDiff = newAccXDiff$/;"	kind:variable	line:67
+lastAccXDiff	..\\Step 8 Power Swing\\PowerSwing.py	/^lastAccXDiff = None$/;"	kind:variable	line:23
+lastAccelerometerValues	..\\Step 8 Power Swing\\PowerSwing.py	/^        lastAccelerometerValues = lastAccelerometerValues[-smoothWindowLength:]$/;"	kind:variable	line:38
+lastAccelerometerValues	..\\Step 8 Power Swing\\PowerSwing.py	/^lastAccelerometerValues = []$/;"	kind:variable	line:26
+lastKickTime	..\\Step 8 Power Swing\\PowerSwing.py	/^                    lastKickTime = time.time()$/;"	kind:variable	line:60
+lastKickTime	..\\Step 8 Power Swing\\PowerSwing.py	/^                    lastKickTime = time.time()$/;"	kind:variable	line:65
+lastKickTime	..\\Step 8 Power Swing\\PowerSwing.py	/^lastKickTime = time.time()$/;"	kind:variable	line:24
+lastSwingVal	..\\Step 3 Track Swing\\TrackSwingPeriod.py	/^lastSwingVal = 0$/;"	kind:variable	line:42
+lastVal	..\\Step 2 Record Swing\\RecordSwingWithTime.py	/^            lastVal = xAcc$/;"	kind:variable	line:24
+lastVal	..\\Step 2 Record Swing\\RecordSwingWithTime.py	/^    lastVal = 0$/;"	kind:variable	line:11
+makeRect	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	/^    def makeRect(self, length, width):$/;"	kind:member	line:130
+martyColour	..\\Step 1 Free Swing\\FreeSwing.py	/^martyColour = (37,167,253)$/;"	kind:variable	line:18
+martyColour	..\\Step 8 Power Swing\\PowerSwing.py	/^martyColour = (37,167,253)$/;"	kind:variable	line:18
+martySizeX	..\\Step 1 Free Swing\\FreeSwing.py	/^martySizeX = martySizeY = screenHeight\/\/2.5$/;"	kind:variable	line:14
+martySizeX	..\\Step 8 Power Swing\\PowerSwing.py	/^martySizeX = martySizeY = screenHeight\/\/2.5$/;"	kind:variable	line:14
+martyX	..\\Step 1 Free Swing\\FreeSwing.py	/^    martyX = screenWidth\/2 + xAcc*screenWidth$/;"	kind:variable	line:28
+martyX	..\\Step 8 Power Swing\\PowerSwing.py	/^    martyX = screenWidth\/2 + accX*screenWidth$/;"	kind:variable	line:75
+martyswing_env.py	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	1;"	kind:file	line:1
+metadata	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	/^    metadata = {$/;"	kind:variable	line:9
+myMarty	..\\Step 1 Free Swing\\FreeSwing.py	/^myMarty = martypy.Marty('socket:\/\/192.168.86.41') # Change IP address to your one$/;"	kind:variable	line:7
+myMarty	..\\Step 2 Record Swing\\RecordSwing.py	/^myMarty = martypy.Marty('socket:\/\/192.168.86.41') # Change IP address to your one$/;"	kind:variable	line:5
+myMarty	..\\Step 2 Record Swing\\RecordSwingWithTime.py	/^myMarty = martypy.Marty('socket:\/\/192.168.86.41') # Change IP address to your one$/;"	kind:variable	line:5
+myMarty	..\\Step 8 Power Swing\\PowerSwing.py	/^myMarty = martypy.Marty('socket:\/\/192.168.86.41') # Change IP address to your one$/;"	kind:variable	line:7
+newAccXDiff	..\\Step 8 Power Swing\\PowerSwing.py	/^            newAccXDiff = accXAvg - lastAccXAvg$/;"	kind:variable	line:49
+newData	..\\Step 3 Track Swing\\TrackSwingPeriod.py	/^    def newData(self, timeSecs, xAcc):$/;"	kind:member	line:10
+newData	..\\Step 4 Predict Swing\\TrackSwingAndPredict.py	/^    def newData(self, timeSecs, xAcc):$/;"	kind:member	line:53
+newData	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^    def newData(self, timeSecs, xAcc):$/;"	kind:member	line:88
+nextAction	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	/^            nextAction = 1$/;"	kind:variable	line:28
+nextAction	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	/^            nextAction = 2$/;"	kind:variable	line:30
+nextAction	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	/^nextAction = 0$/;"	kind:variable	line:14
+np	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	/^import numpy as np$/;"	kind:namespace	line:4
+np	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	/^import numpy as np$/;"	kind:namespace	line:5
+observation	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	/^        observation, reward, done, info = env.step(nextAction)$/;"	kind:variable	line:21
+observation	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	/^    observation = env.reset()$/;"	kind:variable	line:16
+pe	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	/^pe = []$/;"	kind:variable	line:11
+plt	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	/^import matplotlib.pyplot as plt$/;"	kind:namespace	line:4
+predictedValue	..\\Step 4 Predict Swing\\TrackSwingAndPredict.py	/^        predictedValue = swingTracker.newData(timeSecs, xAcc)$/;"	kind:variable	line:116
+predictedValue	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^        predictedValue, filteredValue, delayedValue = swingTracker.newData(timeSecs, xAcc)$/;"	kind:variable	line:154
+predictionOutFile	..\\Step 4 Predict Swing\\TrackSwingAndPredict.py	/^predictionOutFile = "testruns\/martySwingAndPrediction.txt"$/;"	kind:variable	line:105
+predictionOutFile	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^predictionOutFile = "testruns\/martySwingAndPredictionFiltered.txt"$/;"	kind:variable	line:143
+quitRequired	..\\Step 1 Free Swing\\FreeSwing.py	/^            quitRequired = True$/;"	kind:variable	line:38
+quitRequired	..\\Step 1 Free Swing\\FreeSwing.py	/^    quitRequired = False$/;"	kind:variable	line:35
+quitRequired	..\\Step 8 Power Swing\\PowerSwing.py	/^            quitRequired = True$/;"	kind:variable	line:85
+quitRequired	..\\Step 8 Power Swing\\PowerSwing.py	/^    quitRequired = False$/;"	kind:variable	line:82
+render	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	/^    def render(self, mode='human'):$/;"	kind:member	line:134
+reset	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	/^    def reset(self):$/;"	kind:member	line:120
+reward	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	/^        observation, reward, done, info = env.step(nextAction)$/;"	kind:variable	line:21
+screen	..\\Step 1 Free Swing\\FreeSwing.py	/^screen = pygame.display.set_mode(screenSize)$/;"	kind:variable	line:11
+screen	..\\Step 8 Power Swing\\PowerSwing.py	/^screen = pygame.display.set_mode(screenSize)$/;"	kind:variable	line:11
+screenSize	..\\Step 1 Free Swing\\FreeSwing.py	/^screenSize = screenWidth, screenHeight = 800, 600$/;"	kind:variable	line:10
+screenSize	..\\Step 8 Power Swing\\PowerSwing.py	/^screenSize = screenWidth, screenHeight = 800, 600$/;"	kind:variable	line:10
+seed	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	/^    def seed(self, seed=None):$/;"	kind:member	line:80
+setup.py	..\\Step 5 OpenAI Gym Swing\\setup.py	1;"	kind:file	line:1
+smoothWindowLength	..\\Step 8 Power Swing\\PowerSwing.py	/^smoothWindowLength = 5$/;"	kind:variable	line:25
+step	..\\Step 5 OpenAI Gym Swing\\gym_martyswing\\envs\\martyswing_env.py	/^    def step(self, act):$/;"	kind:member	line:84
+swingDataFields	..\\Step 3 Track Swing\\TrackSwingPeriod.py	/^    swingDataFields = swingDataLine.split('\\t')$/;"	kind:variable	line:45
+swingDataFields	..\\Step 4 Predict Swing\\TrackSwingAndPredict.py	/^        swingDataFields = swingDataLine.split('\\t')$/;"	kind:variable	line:113
+swingDataFields	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^        swingDataFields = swingDataLine.split('\\t')$/;"	kind:variable	line:151
+swingDataLines	..\\Step 3 Track Swing\\TrackSwingPeriod.py	/^    swingDataLines = swingDataFile.readlines()$/;"	kind:variable	line:39
+swingDataLines	..\\Step 3 Track Swing\\TrackSwingPeriod.py	/^swingDataLines = []$/;"	kind:variable	line:37
+swingDataLines	..\\Step 4 Predict Swing\\TrackSwingAndPredict.py	/^    swingDataLines = swingDataFile.readlines()$/;"	kind:variable	line:102
+swingDataLines	..\\Step 4 Predict Swing\\TrackSwingAndPredict.py	/^swingDataLines = []$/;"	kind:variable	line:100
+swingDataLines	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^    swingDataLines = swingDataFile.readlines()$/;"	kind:variable	line:140
+swingDataLines	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^swingDataLines = []$/;"	kind:variable	line:138
+swingTracker	..\\Step 3 Track Swing\\TrackSwingPeriod.py	/^swingTracker = MartySwingPeriodTracker(1.2)$/;"	kind:variable	line:34
+swingTracker	..\\Step 4 Predict Swing\\TrackSwingAndPredict.py	/^swingTracker = MartySwingTracker(1.2, 0.4)$/;"	kind:variable	line:97
+swingTracker	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^swingTracker = MartySwingTracker(1.2, 0.4)$/;"	kind:variable	line:135
+testMartySwing.py	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	1;"	kind:file	line:1
+th	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	/^th = []$/;"	kind:variable	line:12
+tim	..\\Step 5 OpenAI Gym Swing\\testMartySwing.py	/^tim = []$/;"	kind:variable	line:9
+timeNow	..\\Step 8 Power Swing\\PowerSwing.py	/^                timeNow = time.time()$/;"	kind:variable	line:53
+timeSecs	..\\Step 3 Track Swing\\TrackSwingPeriod.py	/^    timeSecs = float(swingDataFields[0])$/;"	kind:variable	line:46
+timeSecs	..\\Step 4 Predict Swing\\TrackSwingAndPredict.py	/^        timeSecs = float(swingDataFields[0])$/;"	kind:variable	line:114
+timeSecs	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^        timeSecs = float(swingDataFields[0])$/;"	kind:variable	line:152
+timeSinceLastKickSecs	..\\Step 8 Power Swing\\PowerSwing.py	/^                timeSinceLastKickSecs = timeNow - lastKickTime$/;"	kind:variable	line:54
+timeStart	..\\Step 2 Record Swing\\RecordSwing.py	/^    timeStart = datetime.now()$/;"	kind:variable	line:11
+timeStart	..\\Step 2 Record Swing\\RecordSwingWithTime.py	/^    timeStart = datetime.now()$/;"	kind:variable	line:14
+xAcc	..\\Step 1 Free Swing\\FreeSwing.py	/^    xAcc = myMarty.get_accelerometer('x')$/;"	kind:variable	line:24
+xAcc	..\\Step 2 Record Swing\\RecordSwing.py	/^        xAcc = myMarty.get_accelerometer('x')$/;"	kind:variable	line:15
+xAcc	..\\Step 2 Record Swing\\RecordSwingWithTime.py	/^        xAcc = myMarty.get_accelerometer('x')$/;"	kind:variable	line:18
+xAcc	..\\Step 3 Track Swing\\TrackSwingPeriod.py	/^    xAcc = float(swingDataFields[1])$/;"	kind:variable	line:47
+xAcc	..\\Step 4 Predict Swing\\TrackSwingAndPredict.py	/^        xAcc = float(swingDataFields[1])$/;"	kind:variable	line:115
+xAcc	..\\Step 4 Predict Swing\\TrackSwingAndPredictFiltered.py	/^        xAcc = float(swingDataFields[1])$/;"	kind:variable	line:153

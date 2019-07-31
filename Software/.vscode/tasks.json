@@ -1,0 +1,70 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "TrackSwingPeriod",
+            "type": "shell",
+            "command": "python",
+            "options": {
+                "cwd": "."
+            },
+            "args": [
+                "Step 3 Track Swing/TrackSwingPeriod.py"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "TrackSwingAndPredict",
+            "type": "shell",
+            "command": "python",
+            "options": {
+                "cwd": "."
+            },
+            "args": [
+                "Step 4 Predict Swing/TrackSwingAndPredict.py"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "TrackSwingAndPredictFiltered",
+            "type": "shell",
+            "command": "python",
+            "options": {
+                "cwd": "."
+            },
+            "args": [
+                "Step 4 Predict Swing/TrackSwingAndPredictFiltered.py"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "MartySwingGymTest",
+            "type": "shell",
+            "command": "python",
+            "options": {
+                "cwd": "./Step 5 OpenAI Gym Swing"
+            },
+            "args": [
+                "testMartySwing.py"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "TrackSwingPeriod.py"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "options": {
+                "cwd": "Step 3 Track Swing"
+            }
+        }
+    ]
+}
