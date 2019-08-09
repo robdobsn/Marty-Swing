@@ -1,3 +1,7 @@
+# Test files
+martySwingQLearnLog.txt
+testruns/*.xlsx
+
 # Rhino files
 *.rhl
 *.3dmbak
@@ -59,3 +63,5 @@ node_modules
 # Windows
 Thumbs.db
 
+# VS Code
+settings.json
