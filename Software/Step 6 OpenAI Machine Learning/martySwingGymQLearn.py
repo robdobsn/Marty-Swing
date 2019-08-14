@@ -9,35 +9,41 @@ import matplotlib.pyplot as plt
 import keyboard
 
 # Create the MartySwing environment
-env = gym.make('martyswing-v0')
+env = gym.make('MartySwing-v0')
 
 # Discrete actions
-numActions = env.action_space.n # (nothing, kick, unkick)
+numActions = env.action_space.n # (kick, straight)
 actionNames = ["Kick", "Straight"]
 # Bounds for each state
 stateBounds = (env.observation_space.low, env.observation_space.high)
 # Discrete bounds for observation
-xAccBinBounds = [stateBounds[0]*0.5, stateBounds[0]*0.1, stateBounds[1]*0.1, stateBounds[1]*0.5]
-# Number of discrete states (bins)
-numStateBins = (len(xAccBinBounds)+1,)
+xAccNumBins = 8
+xAccBinBounds = np.linspace(stateBounds[0], stateBounds[1], xAccNumBins)
+xAccBinBounds = xAccBinBounds.flatten()
 
 # Q Table indexed by state-action pair
-qTable = np.zeros(numStateBins + (numActions,))
+qTable = np.zeros((xAccNumBins, numActions))
 
 # Learning and exploration settings
+EXPLORATION_RATE_MAX = 0.7
 EXPLORATION_RATE_MIN = 0.01
-EXPLORATION_RATE_ROLLOFF = 25
-LEARN_RATE_MIN = 0.1
-LEARNING_RATE_ROLLOFF = 25
-DISCOUNT_FACTOR = 0.9
+EXPLORATION_RATE_DECAY_FACTOR = 10
+LEARN_RATE_MAX = 1.0
+LEARN_RATE_MIN = 0.7
+LEARN_RATE_DECAY_FACTOR = 20
+DISCOUNT_FACTOR = 0.99995
 
 # Goal and debug settings
-EPISODE_MAX = 200
+EPISODE_MAX = 2000
 TIME_MAX = 1000
 STREAK_LEN_WHEN_DONE = 100
 REWARD_SUM_GOAL = 20
 LOG_DEBUG = True
 LOG_DEBUG_FILE = "testruns/martySwingQLearnLog.txt"
+
+# Debug
+learnRateVals = []
+exploreRateVals = []
 
 # Main
 def learnToSwing():
@@ -68,13 +74,13 @@ def learnToSwing():
         rewardSum = 0
 
         # Initial state
-        statePrev = getObservationBinned(observation[0])
+        statePrev = getObservationBinned(observation[0], xAccBinBounds)
 
         # Run the experiment over time steps
         for t in range(TIME_MAX):
 
             # Check if we're close to done for debugging
-            if streaksNum > STREAK_LEN_WHEN_DONE - 2:
+            if streaksNum > STREAK_LEN_WHEN_DONE - 1:
                 env.render()
                 time.sleep(0.1)
 
@@ -83,11 +89,13 @@ def learnToSwing():
 
             # Execute the action
             observation, reward, done, _ = env.step(action)
+            state = getObservationBinned(observation[0], xAccBinBounds)
 
             # Get the new state
             rewardInState = reward
-            while True:
-                state = getObservationBinned(observation[0])
+            done = False
+            while not done:
+                state = getObservationBinned(observation[0], xAccBinBounds)
                 if state != statePrev:
                     break
                 observation, reward, done, _ = env.step(action)
@@ -98,7 +106,7 @@ def learnToSwing():
 
             # Update the Q Table using the Bellman equation
             best_q = np.amax(qTable[state])
-            qTable[statePrev + (action,)] += learningRate*(reward + DISCOUNT_FACTOR*(best_q) - qTable[statePrev + (action,)])
+            qTable[statePrev, action] += learningRate*(rewardInState + DISCOUNT_FACTOR*(best_q) - qTable[statePrev, action])
 
             # Setting up for the next iteration
             statePrev = state
@@ -106,7 +114,7 @@ def learnToSwing():
             # Print data
             if logDebugFile is not None:
                 if debugActPrev != action:
-                    logDebugFile.write(f"{actionNames[action]} --- Ep {episode} t {t} Act {action} xAccBin {state[0]} rew {reward} bestQ {best_q} explRate {explorationRate} learnRate {learningRate} Streaks {streaksNum}\n")
+                    logDebugFile.write(f"{actionNames[action]} --- Ep {episode} t {t} Act {action} xAccBin {state} rew {rewardInState} bestQ {best_q} explRate {explorationRate} learnRate {learningRate} Streaks {streaksNum}\n")
                     logDebugFile.write(dumpQTable(qTable))
                     debugActPrev = action
                 # ky = keyboard.read_key()
@@ -118,8 +126,9 @@ def learnToSwing():
                 logStr = "Episode %d finished after %f time steps rewardSum %f learnRate %f exploreRate %f" % (episode, t, rewardSum, learningRate, explorationRate)
                 if logDebugFile:
                     logDebugFile.write("....." + logStr + "\n")
-                print(logStr)
-                print(dumpQTable(qTable))
+                if episode % 100 == 0:
+                    print(logStr)
+                    print(dumpQTable(qTable))
                 if (rewardSum >= REWARD_SUM_GOAL):
                     streaksNum += 1
                 else:
@@ -131,6 +140,8 @@ def learnToSwing():
             break
 
         # Update parameters
+        learnRateVals.append(learningRate)
+        exploreRateVals.append(explorationRate)
         explorationRate = getExplorationRate(episode)
         learningRate = getLearningRate(episode)
 
@@ -140,6 +151,9 @@ def learnToSwing():
 
     print(dumpQTable(qTable))
     plt.plot(rewardTotal, 'p')
+    plt.show()
+    plt.plot(learnRateVals, 'g')
+    plt.plot(exploreRateVals, 'b')
     plt.show()
 
 
@@ -156,17 +170,14 @@ def actionSelect(state, explorationRate):
 
 def getExplorationRate(t):
     # Exploration rate is a log function reducing over time
-    return max(EXPLORATION_RATE_MIN, min(1.0, 1.0 - math.log10((t+1)/EXPLORATION_RATE_ROLLOFF)))
+    return max(EXPLORATION_RATE_MIN, EXPLORATION_RATE_MAX * (1.0 - math.log10(t/EXPLORATION_RATE_DECAY_FACTOR+1)))
 
 def getLearningRate(t):
     # Learning rate is a log function reducing over time
-    return max(LEARN_RATE_MIN, min(1.0, 1.0 - math.log10((t+1)/LEARNING_RATE_ROLLOFF)))
+    return max(LEARN_RATE_MIN, LEARN_RATE_MAX * (1.0 - math.log10(t/LEARN_RATE_DECAY_FACTOR+1)))
 
-def getObservationBinned(xAcc):
-    for i in range(len(xAccBinBounds)):
-        if xAcc < xAccBinBounds[i]:
-            return (i,)
-    return (len(xAccBinBounds),)
+def getObservationBinned(val, bins):
+    return np.digitize(val, bins)
 
 def dumpQTable(qTable):
     dumpStr = ""

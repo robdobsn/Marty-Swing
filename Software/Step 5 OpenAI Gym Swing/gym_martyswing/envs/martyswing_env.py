@@ -76,13 +76,7 @@ class MartySwingEnv(gym.Env):
         return self._get_obs()
 
     def calcPotentialEnergy(self, theta):
-        return self.basePotentialE - self.m * self.g * np.cos(theta) * self.l
-
-    def calcThetaFromPotentialE(self, potentialE, theta):
-        newTheta = np.arccos((self.basePotentialE - potentialE) / (self.l * self.m * self.g))
-        if theta > 0:
-            return newTheta
-        return -newTheta
+        return self.m * self.g * (self.l1 - np.cos(theta) * self.l)
 
     def calcKineticEnergy(self, v):
         return 0.5 * self.m * v * v
@@ -108,7 +102,7 @@ class MartySwingEnv(gym.Env):
                 reward -= 0.03
 
         # Update tangential velocity based on acceleration
-        tangentialAcc = self.m * self.g * np.sin(self.theta)
+        tangentialAcc = self.g * np.sin(self.theta)
         newV = self.v - tangentialAcc * self.dt
 
         # Calculate arc-angle traversed at current v in time dt
@@ -130,7 +124,7 @@ class MartySwingEnv(gym.Env):
         newPotentialE = self.calcPotentialEnergy(newTheta)
 
         # Kinetic
-        newKineticE = self.calcKineticEnergy(self.v)
+        newKineticE = self.calcKineticEnergy(newV)
 
         # Update the state
         self.v = newV

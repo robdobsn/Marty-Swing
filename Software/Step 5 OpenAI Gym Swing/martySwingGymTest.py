@@ -1,46 +1,40 @@
 import gym
 import gym_martyswing
 import time
-import matplotlib.pyplot as plt
 import numpy as np
 
-env = gym.make('martyswing-v0')
+# Create the MartySwing
+env = gym.make('MartySwing-v0')
 
-tim = []
-ke = []
-pe = []
-th = []
-rewardTotal = []
-
+# First action is to remain straight-legged
 nextAction = 1
-for i_episode in range(1):
-    observation = env.reset()
-    rewardSum = 0
-    while(True):
-        env.render()
-        # print(observation)
-        # action = env.action_space.sample()
-        observation, reward, done, info = env.step(nextAction)
-        tim.append(info["t"])
-        pe.append(info["PE"])
-        ke.append(info["KE"]) 
-        th.append(info["theta"])
-        rewardSum += reward / 50
-        rewardTotal.append(rewardSum)
-        # print(np.degrees(info["theta"]), info["PE"])
-        if (info["theta"] < np.radians(5) and info["theta"] > np.radians(-5)) and info["kickAngle"] < 0.01:
-            nextAction = 0
-        elif (info["theta"] < np.radians(-29) or info["theta"] > np.radians(29)) and info["kickAngle"] > 0.01:
-            nextAction = 1
-        if done:
-            print("Episode finished after {} secs".format(info["t"]))
-            break
-        time.sleep(.1)
-            
-env.close()
 
-plt.plot(tim, ke, 'r')
-plt.plot(tim, pe, 'b')
-plt.plot(tim, th, 'g')
-plt.plot(tim, rewardTotal, 'p')
-plt.show()
+# Reset the Gym
+observation = env.reset()
+
+# Go through a number of swings
+while(True):
+    # This display the MartySwing in a window
+    env.render()
+
+    # Take the next action
+    observation, reward, done, info = env.step(nextAction)
+
+    # Select a new action based on the position in the swing cycle
+    if (info["theta"] < np.radians(5) and info["theta"] > np.radians(-5)) and info["kickAngle"] < 0.01:
+        # Kick if we are near the middle and haven't kicked already
+        nextAction = 0
+    elif (info["theta"] < np.radians(-29) or info["theta"] > np.radians(29)) and info["kickAngle"] > 0.01:
+        # Straighten if we are near the top of our swing and not straight-legged already
+        nextAction = 1
+
+    # Check if we completed this test
+    if done:
+        print("Test after {} secs".format(info["t"]))
+        break
+
+    # A short delay to make the display look "normal"
+    time.sleep(.1)
+
+# Close the swing environment
+env.close()

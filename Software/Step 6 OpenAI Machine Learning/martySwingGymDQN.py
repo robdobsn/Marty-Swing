@@ -9,7 +9,7 @@ from keras.optimizers import Adam
 
 from scores.score_logger import ScoreLogger
 
-ENV_NAME = "martyswing-v0"
+ENV_NAME = "MartySwing-v0"
 
 GAMMA = 0.95
 LEARNING_RATE = 0.001
