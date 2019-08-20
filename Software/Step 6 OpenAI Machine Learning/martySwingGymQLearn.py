@@ -17,12 +17,19 @@ actionNames = ["Kick", "Straight"]
 # Bounds for each state
 stateBounds = (env.observation_space.low, env.observation_space.high)
 # Discrete bounds for observation
-xAccNumBins = 8
+xAccNumBins = 6
 xAccBinBounds = np.linspace(stateBounds[0], stateBounds[1], xAccNumBins)
 xAccBinBounds = xAccBinBounds.flatten()
+# Directions
+numDirections = 2
 
 # Q Table indexed by state-action pair
-qTable = np.zeros((xAccNumBins, numActions))
+qTable = np.zeros((xAccNumBins * numDirections, numActions))
+
+# Smoothing of values
+obsList = []
+obsSum = 0
+obsWindowLen = 5
 
 # Learning and exploration settings
 EXPLORATION_RATE_MAX = 0.7
@@ -177,7 +184,16 @@ def getLearningRate(t):
     return max(LEARN_RATE_MIN, LEARN_RATE_MAX * (1.0 - math.log10(t/LEARN_RATE_DECAY_FACTOR+1)))
 
 def getObservationBinned(val, bins):
-    return np.digitize(val, bins)
+    global obsList, obsSum, obsDirection
+    # Smooth the observations
+    obsSumPrev = obsSum
+    if len(obsList) >= obsWindowLen:
+        obsSum -= obsList[0]
+    obsList = obsList[-(obsWindowLen-1):]
+    obsList.append(val)
+    obsSum += val
+    obsDirection = obsSum > obsSumPrev
+    return np.digitize(obsSum/len(obsList), bins) + (0 if obsDirection else xAccNumBins)
 
 def dumpQTable(qTable):
     dumpStr = ""

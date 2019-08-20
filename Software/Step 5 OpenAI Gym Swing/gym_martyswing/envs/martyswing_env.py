@@ -27,6 +27,7 @@ class MartySwingEnv(gym.Env):
         # Initial angle to vertical (anti-clockwise from vertically downwards)
         self.thetaInit = np.radians(thetaInitDeg)
 
+        
         # Initial velocity
         self.vInitial = vInitial
 
@@ -48,7 +49,7 @@ class MartySwingEnv(gym.Env):
         self.action_space = spaces.Discrete(2)
 
         # Observation space - X accelerometer reading only
-        self.maxXAcc = self.m * self.g
+        self.maxXAcc = self.g
         high = np.array([self.maxXAcc])
         self.observation_space = spaces.Box(low=-high, high=high, dtype=np.float32)
 
@@ -135,7 +136,7 @@ class MartySwingEnv(gym.Env):
         return self._get_obs(), reward, done, {"t":self.t, "PE":self.potentialE, "KE":self.kineticE, "v":self.v, "l":self.l, "theta":self.theta, "kickAngle":self.kickAngle}
 
     def _get_obs(self):
-        xAcc = self.m * self.g * np.sin(self.theta)
+        xAcc = - self.g * np.sin(self.theta)
         return np.array([xAcc])
 
     def makeRect(self, length, width):
