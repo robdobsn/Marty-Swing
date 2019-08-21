@@ -117,9 +117,10 @@ class MartySwingEnv(gym.Env):
             self.thetaPeakCount += 1
             if self.thetaPeakCount > 20:
                 done = True
-            if self.thetaMax < newTheta:
-                reward += (newTheta - self.thetaMax) * 1000
-                self.thetaMax = newTheta
+            if self.thetaMax < abs(newTheta):
+                # reward += (abs(newTheta) - self.thetaMax) * 1000
+                self.thetaMax = abs(newTheta)
+            reward += abs(newTheta) * 10
 
         # Potential energy change
         newPotentialE = self.calcPotentialEnergy(newTheta)
@@ -133,7 +134,7 @@ class MartySwingEnv(gym.Env):
         self.potentialE = newPotentialE
         self.theta = newTheta
         self.t += self.dt
-        return self._get_obs(), reward, done, {"t":self.t, "PE":self.potentialE, "KE":self.kineticE, "v":self.v, "l":self.l, "theta":self.theta, "kickAngle":self.kickAngle}
+        return self._get_obs(), reward, done, {"t":self.t, "PE":self.potentialE, "KE":self.kineticE, "v":self.v, "l":self.l, "theta":self.theta, "kickAngle":self.kickAngle, "thetaMax":self.thetaMax}
 
     def _get_obs(self):
         xAcc = - self.g * np.sin(self.theta)

@@ -32,22 +32,23 @@ obsList = []
 obsSum = 0
 obsWindowLen = 5
 
-# Learning and exploration settings
-EXPLORATION_RATE_MAX = 1.0
+# Learning rate and exploration settings
+EXPLORATION_RATE_MAX = 1
 EXPLORATION_RATE_MIN = 0.01
-EXPLORATION_RATE_DECAY_FACTOR = 5
-LEARN_RATE_MAX = 1.0
+EXPLORATION_RATE_DECAY_FACTOR = 10
+LEARN_RATE_MAX = 1
 LEARN_RATE_MIN = 0.1
 LEARN_RATE_DECAY_FACTOR = 50
-DISCOUNT_FACTOR = 0.99995
+DISCOUNT_FACTOR = 0.9
 
 # Goal and debug settings
 EPISODE_MAX = 2000
 TIME_MAX = 1000
 STREAK_LEN_WHEN_DONE = 100
-REWARD_SUM_GOAL = 20
-LOG_DEBUG = False
+REWARD_SUM_GOAL = 110
+LOG_DEBUG = True
 LOG_DEBUG_FILE = "testruns/martySwingQLearnSegLog.txt"
+SHOW_RENDER = False
 
 # Debug
 learnRateVals = []
@@ -85,16 +86,18 @@ def learnToSwing():
         statePrev = getObservationBinned(observation[0], xAccBinBounds)
 
         # Run the experiment over time steps
-        for t in range(TIME_MAX):
+        t = 0
+        while True:
 
             # Render the scene
-            doRender()
+            doRender(streaksNum)
 
             # Select an action
             action = actionSelect(statePrev, explorationRate)
 
             # Execute the action
-            observation, reward, done, _ = env.step(action)
+            observation, reward, done, info = env.step(action)
+            t += 1
             state = getObservationBinned(observation[0], xAccBinBounds)
 
             # Get the new state
@@ -107,10 +110,11 @@ def learnToSwing():
                     break
 
                 # Render the scene
-                doRender()
+                doRender(streaksNum)
 
                 # Repeat last action
-                observation, reward, done, _ = env.step(action)
+                observation, reward, done, info = env.step(action)
+                t += 1
                 rewardInState += reward
 
             # Sum rewards
@@ -133,9 +137,9 @@ def learnToSwing():
             # Setting up for the next iteration
             statePrev = state
 
-            if done:
-                rewardTotal.append(rewardSum)
-                logStr = f"Episode {episode} finished after {t} time steps rewardSum {rewardSum} learnRate {learningRate} exploreRate {explorationRate} streakLen {streaksNum}"
+            if done or t > TIME_MAX:
+                rewardTotal.append(info["thetaMax"])
+                logStr = f"Episode {episode} finished after {t} rewardSum {rewardSum} thetaMax {info['thetaMax']} learnRate {learningRate} exploreRate {explorationRate} streakLen {streaksNum}"
                 if logDebugFile:
                     logDebugFile.write("....." + logStr + "\n")
                 if episode % 100 == 0:
@@ -180,6 +184,11 @@ def actionSelect(state, explorationRate):
         action = np.argmax(qTable[state])
     return action
 
+def actionSelectFix(state, explorationRate):
+    if state == 4 or state == 13:
+        return 0
+    return 1
+
 def getExplorationRate(t):
     # Exploration rate is a log function reducing over time
     return max(EXPLORATION_RATE_MIN, EXPLORATION_RATE_MAX * (1.0 - math.log10(t/EXPLORATION_RATE_DECAY_FACTOR+1)))
@@ -201,9 +210,10 @@ def getObservationBinned(val, bins):
     obsList = obsList[-(obsWindowLen-1):]
     obsList.append(val)
     obsSum += val
-    obsDirection = obsSum >= obsSumPrev
-    discreteVal = np.digitize(obsSum/len(obsList), bins) + (0 if obsDirection else xAccNumBins)
-    return discreteVal
+    discreteVal = np.digitize(obsSum/len(obsList), bins)
+    if obsSum >= obsSumPrev:
+        return discreteVal
+    return xAccNumBins * 2 - 1 - discreteVal
 
 def dumpQTable(qTable):
     dumpStr = ""
@@ -222,10 +232,10 @@ indHueMax = 100/360
 kickIndicators = []
 binBoundsAngles = [np.arcsin(np.clip(binBound / 9.81, -1, 1)) for binBound in xAccBinBounds]
 binCentreAngles = [(binBoundsAngles[binBoundsIdx]+binBoundsAngles[binBoundsIdx-1])/2 for binBoundsIdx in range(1,len(binBoundsAngles))]
-binCentreAngles.insert(0, binBoundsAngles[0] - 0.2)
-binCentreAngles.append(- binBoundsAngles[0] + 0.2)
 
-def doRender():
+def doRender(numStreaks):
+    if (not SHOW_RENDER) and (numStreaks != STREAK_LEN_WHEN_DONE-1):
+        return
     from gym.envs.classic_control import rendering
     oldViewer = env.viewer
     env.render()
@@ -258,7 +268,9 @@ def doRender():
     
     for i in range(len(binCentreAngles)):
         for j in range(numDirections):
-            qIdx = i+(j*len(binCentreAngles))
+            qIdx = i+1
+            if j > 0:
+                qIdx = 2*(len(binCentreAngles)+2)-i-2
             qRowRange = qTable[qIdx][0] - qTable[qIdx][1]
             if qRowRange <= -0.01:
                 indHue = indHueMin
