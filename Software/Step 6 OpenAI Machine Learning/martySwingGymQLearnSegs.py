@@ -35,10 +35,10 @@ obsWindowLen = 5
 # Learning rate and exploration settings
 EXPLORATION_RATE_MAX = 1
 EXPLORATION_RATE_MIN = 0.01
-EXPLORATION_RATE_DECAY_FACTOR = 10
-LEARN_RATE_MAX = 1
-LEARN_RATE_MIN = 0.1
-LEARN_RATE_DECAY_FACTOR = 50
+EXPLORATION_RATE_DECAY_FACTOR = 3
+LEARN_RATE_MAX = 0.5
+LEARN_RATE_MIN = 0.05
+LEARN_RATE_DECAY_FACTOR = 1
 DISCOUNT_FACTOR = 0.9
 
 # Goal and debug settings
@@ -48,7 +48,7 @@ STREAK_LEN_WHEN_DONE = 100
 REWARD_SUM_GOAL = 110
 LOG_DEBUG = True
 LOG_DEBUG_FILE = "testruns/martySwingQLearnSegLog.txt"
-SHOW_RENDER = False
+SHOW_RENDER = True
 
 # Debug
 learnRateVals = []
@@ -127,7 +127,7 @@ def learnToSwing():
             # Print data
             if logDebugFile is not None:
                 # if debugActPrev != action:
-                logDebugFile.write(f"{actionNames[action]} --- Ep {episode} t {t} statePrev {statePrev} state {state} rew {rewardInState} {'+' if rewardInState > 0 else '-'} bestQ {best_q} explRate {explorationRate} learnRate {learningRate} Streaks {streaksNum}\n")
+                logDebugFile.write(f"{actionNames[action]} --- Ep {episode} t {t} statePrev {statePrev} state {state} rew {rewardInState} {'+' if rewardInState > 0 else '-'} bestQ {best_q} PE {info['PE']} KE {info['KE']} TE {info['PE']+info['KE']} theta {info['theta']} thetaMax {info['thetaMax']} v {info['v']} explRate {explorationRate} learnRate {learningRate} Streaks {streaksNum} \n")
                 logDebugFile.write(dumpQTable(qTable))
                 debugActPrev = action
                 # ky = keyboard.read_key()

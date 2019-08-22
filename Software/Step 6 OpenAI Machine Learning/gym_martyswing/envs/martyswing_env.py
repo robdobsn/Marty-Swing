@@ -27,7 +27,6 @@ class MartySwingEnv(gym.Env):
         # Initial angle to vertical (anti-clockwise from vertically downwards)
         self.thetaInit = np.radians(thetaInitDeg)
 
-        
         # Initial velocity
         self.vInitial = vInitial
 
@@ -118,9 +117,11 @@ class MartySwingEnv(gym.Env):
             if self.thetaPeakCount > 20:
                 done = True
             if self.thetaMax < abs(newTheta):
-                # reward += (abs(newTheta) - self.thetaMax) * 1000
+                reward += (abs(newTheta) - self.thetaMax) * 1000
                 self.thetaMax = abs(newTheta)
-            reward += abs(newTheta) * 10
+            else:
+                reward += (abs(newTheta) - self.thetaMax) * 10
+            # reward += abs(newTheta) * 10
 
         # Potential energy change
         newPotentialE = self.calcPotentialEnergy(newTheta)
