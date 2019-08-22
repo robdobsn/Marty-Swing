@@ -15,6 +15,8 @@ env = gym.make('MartySwing-v0')
 # Discrete actions
 numActions = env.action_space.n # (kick, straight)
 actionNames = ["Kick", "Straight", ""]
+ACTION_KICK = 0
+ACTION_STRAIGHT = 1
 # Bounds for each state
 stateBounds = (env.observation_space.low, env.observation_space.high)
 # Discrete bounds for observation
@@ -35,20 +37,21 @@ obsWindowLen = 5
 # Learning rate and exploration settings
 EXPLORATION_RATE_MAX = 1
 EXPLORATION_RATE_MIN = 0.01
-EXPLORATION_RATE_DECAY_FACTOR = 3
-LEARN_RATE_MAX = 0.5
-LEARN_RATE_MIN = 0.05
-LEARN_RATE_DECAY_FACTOR = 1
+EXPLORATION_RATE_DECAY_FACTOR = 10
+LEARN_RATE_MAX = 1
+LEARN_RATE_MIN = 0.1
+LEARN_RATE_DECAY_FACTOR = 50
 DISCOUNT_FACTOR = 0.9
 
 # Goal and debug settings
 EPISODE_MAX = 2000
 TIME_MAX = 1000
 STREAK_LEN_WHEN_DONE = 100
-REWARD_SUM_GOAL = 110
+REWARD_SUM_GOAL = 100
 LOG_DEBUG = True
 LOG_DEBUG_FILE = "testruns/martySwingQLearnSegLog.txt"
-SHOW_RENDER = True
+SHOW_RENDER = False
+FIXED_ACTION = False
 
 # Debug
 learnRateVals = []
@@ -80,72 +83,71 @@ def learnToSwing():
 
         # Reset the environment
         observation = env.reset()
-        rewardSum = 0
+        episodeRewardSum = 0
 
         # Initial state
         statePrev = getObservationBinned(observation[0], xAccBinBounds)
+        state = statePrev
 
         # Run the experiment over time steps
         t = 0
+        rewardInState = 0
+        action = ACTION_STRAIGHT
         while True:
 
             # Render the scene
             doRender(streaksNum)
-
-            # Select an action
-            action = actionSelect(statePrev, explorationRate)
 
             # Execute the action
             observation, reward, done, info = env.step(action)
             t += 1
             state = getObservationBinned(observation[0], xAccBinBounds)
 
-            # Get the new state
-            rewardInState = reward
-            done = False
-            while not done:
-                # Get state
-                state = getObservationBinned(observation[0], xAccBinBounds)
-                if state != statePrev:
-                    break
-
-                # Render the scene
-                doRender(streaksNum)
-
-                # Repeat last action
-                observation, reward, done, info = env.step(action)
-                t += 1
-                rewardInState += reward
-
-            # Sum rewards
-            rewardSum += rewardInState
-
-            # Update the Q Table using the Bellman equation
-            best_q = np.amax(qTable[state])
-            qTable[statePrev, action] += learningRate*(rewardInState + DISCOUNT_FACTOR*(best_q) - qTable[statePrev, action])
-
-            # Print data
+            # Accumulate rewards in this state
+            rewardInState += reward
+           
+            # Log data
             if logDebugFile is not None:
                 # if debugActPrev != action:
-                logDebugFile.write(f"{actionNames[action]} --- Ep {episode} t {t} statePrev {statePrev} state {state} rew {rewardInState} {'+' if rewardInState > 0 else '-'} bestQ {best_q} PE {info['PE']} KE {info['KE']} TE {info['PE']+info['KE']} theta {info['theta']} thetaMax {info['thetaMax']} v {info['v']} explRate {explorationRate} learnRate {learningRate} Streaks {streaksNum} \n")
-                logDebugFile.write(dumpQTable(qTable))
-                debugActPrev = action
+                logDebugFile.write(f"{actionNames[action]} --- Ep {episode} t {t} statePrev {statePrev} state {state} rew {rewardInState:.2f} {'[+]' if rewardInState > 0 else ('[~]' if rewardInState > -1 else '[-]')} PE {info['PE']:.2f} KE {info['KE']:.2f} TE {info['PE']+info['KE']:.2f} theta {info['theta']:.2f} thetaMax {info['thetaMax']:.2f} v {info['v']:.2f} explRate {explorationRate} learnRate {learningRate} Streaks {streaksNum} \n")
+                # debugActPrev = action
                 # ky = keyboard.read_key()
                 # if ky == 'esc':
                 #     exit(0)
 
-            # Setting up for the next iteration
+            # Check if there has been a change of state
+            if state != statePrev:
+
+                # Update the Q Table using the Bellman equation
+                best_q = np.amax(qTable[state])
+                qTable[statePrev, action] += learningRate*(rewardInState + DISCOUNT_FACTOR*(best_q) - qTable[statePrev, action])
+
+                if logDebugFile is not None:
+                    logDebugFile.write(dumpQTable(qTable))
+
+                # Select a new action
+                if not FIXED_ACTION:
+                    action = actionSelect(statePrev, explorationRate)
+                else:
+                    action = actionSelectFix(statePrev, explorationRate)
+
+                # Sum rewards in episode
+                episodeRewardSum += rewardInState
+                rewardInState = 0
+
+            # Ready for next iteration
             statePrev = state
 
+            # Check for done
             if done or t > TIME_MAX:
                 rewardTotal.append(info["thetaMax"])
-                logStr = f"Episode {episode} finished after {t} rewardSum {rewardSum} thetaMax {info['thetaMax']} learnRate {learningRate} exploreRate {explorationRate} streakLen {streaksNum}"
+                logStr = f"Episode {episode} finished after {t} episodeRewardSum {episodeRewardSum:.2f} thetaMax {info['thetaMax']:.2f} learnRate {learningRate:.2f} exploreRate {explorationRate:.2f} streakLen {streaksNum}"
                 if logDebugFile:
                     logDebugFile.write("....." + logStr + "\n")
                 if episode % 100 == 0:
                     print(dumpQTable(qTable))
                 print(logStr)
-                if (rewardSum >= REWARD_SUM_GOAL):
+                if (episodeRewardSum >= REWARD_SUM_GOAL):
                     streaksNum += 1
                 else:
                     streaksNum = 0
@@ -273,9 +275,9 @@ def doRender(numStreaks):
                 qIdx = 2*(len(binCentreAngles)+2)-i-2
             qRowRange = qTable[qIdx][0] - qTable[qIdx][1]
             if qRowRange <= -0.01:
-                indHue = indHueMin
-            elif qRowRange >= 0.01:
                 indHue = indHueMax
+            elif qRowRange >= 0.01:
+                indHue = indHueMin
             else:
                 indHue = (indHueMax + indHueMin) / 2
             rgbColour = matplotlib.colors.hsv_to_rgb((indHue, 1, 1))

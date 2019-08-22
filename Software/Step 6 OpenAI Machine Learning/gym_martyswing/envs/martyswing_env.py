@@ -93,13 +93,13 @@ class MartySwingEnv(gym.Env):
             if self.kickAngle != self.kickAngleKicked:
                 self.l = self.l2
                 self.kickAngle = self.kickAngleKicked
-                reward -= 0.1
+                # reward -= 0.1
         else:
             # Strighten if we are not already in a kick state
             if self.kickAngle != self.kickAngleStright:
                 self.l = self.l1
                 self.kickAngle = self.kickAngleStright
-                reward -= 0.03
+                # reward -= 0.03
 
         # Update tangential velocity based on acceleration
         tangentialAcc = self.g * np.sin(self.theta)
@@ -116,11 +116,13 @@ class MartySwingEnv(gym.Env):
             self.thetaPeakCount += 1
             if self.thetaPeakCount > 20:
                 done = True
+            # reward += (abs(newTheta) - self.thetaMax) * 1000
             if self.thetaMax < abs(newTheta):
-                reward += (abs(newTheta) - self.thetaMax) * 1000
+                # reward += (abs(newTheta) - self.thetaMax) * 1000
+                reward += abs(newTheta) * 1000
                 self.thetaMax = abs(newTheta)
-            else:
-                reward += (abs(newTheta) - self.thetaMax) * 10
+            # else:
+            #     reward += (abs(newTheta) - self.thetaMax) * 10
             # reward += abs(newTheta) * 10
 
         # Potential energy change
