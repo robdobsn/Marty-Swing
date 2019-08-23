@@ -48,7 +48,7 @@ LOG_DEBUG = False
 LOG_DEBUG_FILE = "testruns/martySwingQLearnSegLog.txt"
 SHOW_RENDER = False
 FIXED_ACTION = False
-PERMUTE_ACTION = False
+PERMUTE_ACTION = True
 
 # Debug
 learnRateVals = []
@@ -97,7 +97,7 @@ def learnToSwing():
         while True:
 
             # Render the scene
-            doRender(streaksNum)
+            doRender(episode, streaksNum)
 
             # Execute the action
             observation, reward, done, info = env.step(action)
@@ -144,8 +144,8 @@ def learnToSwing():
             statePrev = state
 
             # Check for done
-            if done or t > TIME_MAX or (PERMUTE_ACTION and permutesDone(episode)):
-                rewardTotal.append(info["thetaMax"])
+            if done or t > TIME_MAX:
+                rewardTotal.append(episodeRewardSum)
                 logStr = f"Episode {episode} finished after {t} episodeRewardSum {episodeRewardSum:.2f} thetaMax {info['thetaMax']:.2f} learnRate {learningRate:.2f} exploreRate {explorationRate:.2f} streakLen {streaksNum}"
                 if logDebugFile:
                     logDebugFile.write("....." + logStr + "\n")
@@ -159,7 +159,7 @@ def learnToSwing():
                 break
 
         # It's considered done when it's solved over 100 times consecutively
-        if streaksNum > STREAK_LEN_WHEN_DONE:
+        if (streaksNum > STREAK_LEN_WHEN_DONE) or (PERMUTE_ACTION and permutesDone(episode)):
             break
 
         # Update parameters
@@ -267,8 +267,8 @@ kickIndicators = []
 binBoundsAngles = [np.arcsin(np.clip(binBound / 9.81, -1, 1)) for binBound in xAccBinBounds]
 binCentreAngles = [(binBoundsAngles[binBoundsIdx]+binBoundsAngles[binBoundsIdx-1])/2 for binBoundsIdx in range(1,len(binBoundsAngles))]
 
-def doRender(numStreaks):
-    if (not SHOW_RENDER) and (numStreaks != STREAK_LEN_WHEN_DONE-1):
+def doRender(episode, numStreaks):
+    if (not SHOW_RENDER) and (numStreaks != STREAK_LEN_WHEN_DONE-1) and (PERMUTE_ACTION and episode != 124):
         return
     from gym.envs.classic_control import rendering
     oldViewer = env.viewer
