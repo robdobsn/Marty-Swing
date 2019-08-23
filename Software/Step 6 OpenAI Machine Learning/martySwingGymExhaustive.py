@@ -14,11 +14,13 @@ env = gym.make('MartySwing-v0')
 
 # Discrete actions
 numActions = env.action_space.n # (kick, straight)
-actionNames = ["Kick", "Straight"]
+actionNames = ["Straight", "Kick"]
+ACTION_STRAIGHT = 0
+ACTION_KICK = 1
 # Bounds for each state
 stateBounds = (env.observation_space.low, env.observation_space.high)
 # Discrete bounds for observation
-xAccNumBins = 12
+xAccNumBins = 9
 xAccBinBounds = np.linspace(stateBounds[0], stateBounds[1], xAccNumBins)
 xAccBinBounds = xAccBinBounds.flatten()
 # Used bin start and count

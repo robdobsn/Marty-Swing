@@ -23,6 +23,7 @@ class MartySwingEnv(gym.Env):
         self.l1 = l1
         self.l2 = l2
         self.l = self.l1
+        self.ACTION_KICK = 1
 
         # Initial angle to vertical (anti-clockwise from vertically downwards)
         self.thetaInit = np.radians(thetaInitDeg)
@@ -88,7 +89,7 @@ class MartySwingEnv(gym.Env):
     def step(self, act):
         # Immediate implementation of action
         reward = 0
-        if act == 0:
+        if act == self.ACTION_KICK:
             # Kick if we are not already in a kick state
             if self.kickAngle != self.kickAngleKicked:
                 self.l = self.l2

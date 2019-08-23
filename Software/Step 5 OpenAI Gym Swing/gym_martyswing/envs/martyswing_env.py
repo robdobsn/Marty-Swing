@@ -27,7 +27,6 @@ class MartySwingEnv(gym.Env):
         # Initial angle to vertical (anti-clockwise from vertically downwards)
         self.thetaInit = np.radians(thetaInitDeg)
 
-        
         # Initial velocity
         self.vInitial = vInitial
 
@@ -133,7 +132,7 @@ class MartySwingEnv(gym.Env):
         self.potentialE = newPotentialE
         self.theta = newTheta
         self.t += self.dt
-        return self._get_obs(), reward, done, {"t":self.t, "PE":self.potentialE, "KE":self.kineticE, "v":self.v, "l":self.l, "theta":self.theta, "kickAngle":self.kickAngle}
+        return self._get_obs(), reward, done, {"t":self.t, "PE":self.potentialE, "KE":self.kineticE, "v":self.v, "l":self.l, "theta":self.theta, "kickAngle":self.kickAngle, "thetaMax":self.thetaMax}
 
     def _get_obs(self):
         xAcc = - self.g * np.sin(self.theta)

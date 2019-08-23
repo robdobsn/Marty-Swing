@@ -13,10 +13,10 @@ import keyboard
 env = gym.make('MartySwing-v0')
 
 # Discrete actions
-numActions = env.action_space.n # (kick, straight)
-actionNames = ["Kick", "Straight", ""]
-ACTION_KICK = 0
-ACTION_STRAIGHT = 1
+numActions = env.action_space.n # (straight, kick)
+actionNames = ["Straight", "Kick", ""]
+ACTION_STRAIGHT = 0
+ACTION_KICK = 1
 # Bounds for each state
 stateBounds = (env.observation_space.low, env.observation_space.high)
 # Discrete bounds for observation
@@ -46,9 +46,9 @@ DISCOUNT_FACTOR = 0.9
 # Goal and debug settings
 EPISODE_MAX = 2000
 TIME_MAX = 1000
-STREAK_LEN_WHEN_DONE = 100
+STREAK_LEN_WHEN_DONE = 50
 REWARD_SUM_GOAL = 100
-LOG_DEBUG = True
+LOG_DEBUG = False
 LOG_DEBUG_FILE = "testruns/martySwingQLearnSegLog.txt"
 SHOW_RENDER = False
 FIXED_ACTION = False
@@ -176,6 +176,8 @@ def learnToSwing():
 
 
 def actionSelect(state, explorationRate):
+    if state >= xAccNumBins:
+        return 0    
     # The exploration rate determines the likelihood of taking a random
     # action vs the action with the best Q
     if random.random() < explorationRate:
@@ -188,8 +190,8 @@ def actionSelect(state, explorationRate):
 
 def actionSelectFix(state, explorationRate):
     if state == 4 or state == 13:
-        return 0
-    return 1
+        return ACTION_KICK
+    return ACTION_STRAIGHT
 
 def getExplorationRate(t):
     # Exploration rate is a log function reducing over time
@@ -275,17 +277,15 @@ def doRender(numStreaks):
                 qIdx = 2*(len(binCentreAngles)+2)-i-2
             qRowRange = qTable[qIdx][0] - qTable[qIdx][1]
             if qRowRange <= -0.01:
-                indHue = indHueMax
-            elif qRowRange >= 0.01:
                 indHue = indHueMin
+            elif qRowRange >= 0.01:
+                indHue = indHueMax
             else:
                 indHue = (indHueMax + indHueMin) / 2
             rgbColour = matplotlib.colors.hsv_to_rgb((indHue, 1, 1))
             kickIndicators[i][j].set_color(rgbColour[0], rgbColour[1], rgbColour[2])
 
     env.render()
-    # print(dumpQTable(qTable))
-
     time.sleep(0.01)
 
 if __name__ == "__main__":

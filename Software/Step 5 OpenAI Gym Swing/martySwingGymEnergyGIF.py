@@ -84,8 +84,9 @@ while(True):
 
     # Check if we completed this test
     if info["t"] > maxTime and not done:
-        print("Saving GIF image")
-        with open('MartySwingEnergy.gif' if not martyPumps else 'MartySwingPumpEnergy.gif', 'wb') as outFile:
+        fileName = 'MartySwingEnergy.gif' if not martyPumps else 'MartySwingPumpEnergy.gif'
+        print("Saving GIF image as", fileName)
+        with open(fileName, 'wb') as outFile:
             im = Image.new('RGB', framesEnergy[0].size)
             im.save(outFile, save_all=True, append_images=framesEnergy)
         break
