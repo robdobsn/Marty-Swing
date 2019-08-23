@@ -7,8 +7,9 @@ import numpy as np
 import time, math, random
 import matplotlib.pyplot as plt
 import matplotlib
-import keyboard
 import itertools
+from PIL import Image
+import matplotlib.pyplot as plt
 
 # Create the MartySwing environment
 env = gym.make('MartySwing-v0')
@@ -31,24 +32,28 @@ numDirections = 2
 qTable = np.zeros((xAccNumBins * numDirections, numActions))
 
 # Learning rate and exploration settings
-EXPLORATION_RATE_MAX = 0.3
-EXPLORATION_RATE_MIN = 0.1
-EXPLORATION_RATE_DECAY_FACTOR = 5
-LEARN_RATE_MAX = 0.3
+EXPLORATION_RATE_MAX = 1
+EXPLORATION_RATE_MIN = 0.01
+EXPLORATION_RATE_DECAY_FACTOR = 10
+LEARN_RATE_MAX = 1
 LEARN_RATE_MIN = 0.1
-LEARN_RATE_DECAY_FACTOR = 5
-DISCOUNT_FACTOR = 0.99
+LEARN_RATE_DECAY_FACTOR = 50
+DISCOUNT_FACTOR = 0.9
 
 # Goal and debug settings
 EPISODE_MAX = 2000
 TIME_MAX = 1000
 STREAK_LEN_WHEN_DONE = 50
-REWARD_SUM_GOAL = 1000
+REWARD_SUM_GOAL = 2500
 LOG_DEBUG = False
 LOG_DEBUG_FILE = "testruns/martySwingQLearnSegLog.txt"
-SHOW_RENDER = False
+SHOW_ALL_RENDERS = False
+GEN_GIF = False
 FIXED_ACTION = False
-PERMUTE_ACTION = True
+PERMUTE_ACTION = False
+RENDER_LAST = True
+RENDER_BEST_PERMUTE = True
+GIF_BEST = True
 
 # Debug
 learnRateVals = []
@@ -97,7 +102,8 @@ def learnToSwing():
         while True:
 
             # Render the scene
-            doRender(episode, streaksNum)
+            if SHOW_ALL_RENDERS or (RENDER_LAST and streaksNum == STREAK_LEN_WHEN_DONE-1) or (PERMUTE_ACTION and RENDER_BEST_PERMUTE and episode == 124):
+                doRender(episode, streaksNum)
 
             # Execute the action
             observation, reward, done, info = env.step(action)
@@ -109,12 +115,7 @@ def learnToSwing():
            
             # Log data
             if logDebugFile is not None:
-                # if debugActPrev != action:
                 logDebugFile.write(f"{actionNames[action]} --- Ep {episode} t {t} statePrev {statePrev} state {state} rew {rewardInState:.2f} {'[+]' if rewardInState > 0 else ('[~]' if rewardInState > -1 else '[-]')} PE {info['PE']:.2f} KE {info['KE']:.2f} TE {info['PE']+info['KE']:.2f} theta {info['theta']:.2f} thetaMax {info['thetaMax']:.2f} v {info['v']:.2f} explRate {explorationRate} learnRate {learningRate} Streaks {streaksNum} \n")
-                # debugActPrev = action
-                # ky = keyboard.read_key()
-                # if ky == 'esc':
-                #     exit(0)
 
             # Check if there has been a change of state
             if state != statePrev:
@@ -143,7 +144,11 @@ def learnToSwing():
             # Ready for next iteration
             statePrev = state
 
-            # Check for done
+            # Add frame to GIF
+            if GEN_GIF:
+                addFrame(episode, streaksNum, info)
+
+            # Check for episode done
             if done or t > TIME_MAX:
                 rewardTotal.append(episodeRewardSum)
                 logStr = f"Episode {episode} finished after {t} episodeRewardSum {episodeRewardSum:.2f} thetaMax {info['thetaMax']:.2f} learnRate {learningRate:.2f} exploreRate {explorationRate:.2f} streakLen {streaksNum}"
@@ -172,6 +177,10 @@ def learnToSwing():
     if logDebugFile:
         logDebugFile.close()
 
+    # Save GIF
+    if GEN_GIF:
+        saveGIF()
+
     print(dumpQTable(qTable))
     plt.plot(rewardTotal, 'p')
     plt.show()
@@ -181,8 +190,6 @@ def learnToSwing():
 
 
 def actionSelect(episode, state, explorationRate):
-    # if state >= xAccNumBins:
-    #     return 0    
     # The exploration rate determines the likelihood of taking a random
     # action vs the action with the best Q
     if random.random() < explorationRate:
@@ -267,12 +274,10 @@ kickIndicators = []
 binBoundsAngles = [np.arcsin(np.clip(binBound / 9.81, -1, 1)) for binBound in xAccBinBounds]
 binCentreAngles = [(binBoundsAngles[binBoundsIdx]+binBoundsAngles[binBoundsIdx-1])/2 for binBoundsIdx in range(1,len(binBoundsAngles))]
 
-def doRender(episode, numStreaks):
-    if (not SHOW_RENDER) and (numStreaks != STREAK_LEN_WHEN_DONE-1) and (PERMUTE_ACTION and episode != 124):
-        return
+def doRender(episode, numStreaks, mode='human'):
     from gym.envs.classic_control import rendering
     oldViewer = env.viewer
-    env.render()
+    env.render(mode)
     if oldViewer is None:
         lineStart = -0.5
         lineEnd = -1
@@ -315,8 +320,60 @@ def doRender(episode, numStreaks):
             rgbColour = matplotlib.colors.hsv_to_rgb((indHue, 1, 1))
             kickIndicators[i][j].set_color(rgbColour[0], rgbColour[1], rgbColour[2])
 
-    env.render()
+    retVal = env.render(mode)
     time.sleep(.01)
+    return retVal
+
+# List of images for the GIF
+framesAngle = []
+tim = []
+th = []
+maxTime = 8
+def addFrame(episode, streaksNum, info):
+
+    if not((GIF_BEST and streaksNum == STREAK_LEN_WHEN_DONE-1) or (not GIF_BEST and episode == 0)):
+        return
+
+    # Render the image of marty swinging
+    martyImage = Image.fromarray(doRender(0, 0, mode='rgb_array'))
+
+    # Add to data series
+    tim.append(info["t"])
+    th.append(np.degrees(info["theta"]))
+
+    # Plot angle
+    axes = plt.gca()
+    axes.set_xlim([0,maxTime])
+    axes.set_ylim([-60,60])
+    plt.plot(tim, th, 'g')
+    plt.suptitle("Marty Swing Q-Learn", fontsize=30)
+    plt.ylabel('Swing Angle', fontsize=16)
+    canvas = plt.get_current_fig_manager().canvas
+    canvas.draw()
+    plotImage = Image.frombytes('RGB', canvas.get_width_height(), 
+                 canvas.tostring_rgb())
+    wRatio = (martyImage.size[0]/float(plotImage.size[0]))
+    hReq = int((float(plotImage.size[1])*float(wRatio)))
+    plotImage = plotImage.resize((martyImage.size[0], hReq), Image.ANTIALIAS)
+
+    # Plot together
+    cropTop = 100
+    cropBottom = 100
+    totalWidth = martyImage.size[0]
+    totalHeight = martyImage.size[1] + plotImage.size[1] - cropTop - cropBottom
+    outImage = Image.new("RGB", (totalWidth, totalHeight))
+    outImage.paste(martyImage, (0,-cropTop))
+    outImage.paste(plotImage, (0,martyImage.size[1]-cropTop-cropBottom))
+
+    # Add the combined image to a list
+    framesAngle.append(outImage)
+
+def saveGIF():
+    fileName = 'MartySwingQLearn.gif'
+    print("Saving GIF image", fileName)
+    with open(fileName, 'wb') as outFile:
+        im = Image.new('RGB', framesAngle[0].size)
+        im.save(outFile, save_all=True, append_images=framesAngle)
 
 if __name__ == "__main__":
     learnToSwing()

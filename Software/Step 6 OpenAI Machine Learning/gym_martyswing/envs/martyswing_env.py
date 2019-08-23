@@ -115,7 +115,7 @@ class MartySwingEnv(gym.Env):
         done = False
         if (newV > 0) != (self.v > 0):
             self.thetaPeakCount += 1
-            if self.thetaPeakCount > 20:
+            if self.thetaPeakCount > 10:
                 done = True
             # reward += (abs(newTheta) - self.thetaMax) * 1000
             if self.thetaMax < abs(newTheta):
