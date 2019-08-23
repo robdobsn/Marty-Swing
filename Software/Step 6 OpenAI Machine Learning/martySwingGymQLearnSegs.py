@@ -8,6 +8,7 @@ import time, math, random
 import matplotlib.pyplot as plt
 import matplotlib
 import keyboard
+import itertools
 
 # Create the MartySwing environment
 env = gym.make('MartySwing-v0')
@@ -29,29 +30,25 @@ numDirections = 2
 # Q Table indexed by state-action pair
 qTable = np.zeros((xAccNumBins * numDirections, numActions))
 
-# Smoothing of values
-obsList = []
-obsSum = 0
-obsWindowLen = 5
-
 # Learning rate and exploration settings
-EXPLORATION_RATE_MAX = 1
-EXPLORATION_RATE_MIN = 0.01
-EXPLORATION_RATE_DECAY_FACTOR = 10
-LEARN_RATE_MAX = 1
+EXPLORATION_RATE_MAX = 0.3
+EXPLORATION_RATE_MIN = 0.1
+EXPLORATION_RATE_DECAY_FACTOR = 5
+LEARN_RATE_MAX = 0.3
 LEARN_RATE_MIN = 0.1
-LEARN_RATE_DECAY_FACTOR = 50
-DISCOUNT_FACTOR = 0.9
+LEARN_RATE_DECAY_FACTOR = 5
+DISCOUNT_FACTOR = 0.99
 
 # Goal and debug settings
 EPISODE_MAX = 2000
 TIME_MAX = 1000
 STREAK_LEN_WHEN_DONE = 50
-REWARD_SUM_GOAL = 100
+REWARD_SUM_GOAL = 1000
 LOG_DEBUG = False
 LOG_DEBUG_FILE = "testruns/martySwingQLearnSegLog.txt"
 SHOW_RENDER = False
 FIXED_ACTION = False
+PERMUTE_ACTION = False
 
 # Debug
 learnRateVals = []
@@ -89,6 +86,10 @@ def learnToSwing():
         statePrev = getObservationBinned(observation[0], xAccBinBounds)
         state = statePrev
 
+        # Setup for permutation
+        if PERMUTE_ACTION:
+            permuteTableSetup(episode)
+
         # Run the experiment over time steps
         t = 0
         rewardInState = 0
@@ -118,18 +119,22 @@ def learnToSwing():
             # Check if there has been a change of state
             if state != statePrev:
 
-                # Update the Q Table using the Bellman equation
-                best_q = np.amax(qTable[state])
-                qTable[statePrev, action] += learningRate*(rewardInState + DISCOUNT_FACTOR*(best_q) - qTable[statePrev, action])
+                if not PERMUTE_ACTION:
+                    # Update the Q Table using the Bellman equation
+                    best_q = np.amax(qTable[state])
+                    qTable[statePrev, action] += learningRate*(rewardInState + DISCOUNT_FACTOR*(best_q) - qTable[statePrev, action])
 
+                # Debug
                 if logDebugFile is not None:
                     logDebugFile.write(dumpQTable(qTable))
 
                 # Select a new action
-                if not FIXED_ACTION:
-                    action = actionSelect(statePrev, explorationRate)
+                if FIXED_ACTION:
+                    action = actionSelectFix(episode, state, explorationRate)
+                elif PERMUTE_ACTION:
+                    action = actionSelectPermute(episode, state, explorationRate)                    
                 else:
-                    action = actionSelectFix(statePrev, explorationRate)
+                    action = actionSelect(episode, state, explorationRate)
 
                 # Sum rewards in episode
                 episodeRewardSum += rewardInState
@@ -139,7 +144,7 @@ def learnToSwing():
             statePrev = state
 
             # Check for done
-            if done or t > TIME_MAX:
+            if done or t > TIME_MAX or (PERMUTE_ACTION and permutesDone(episode)):
                 rewardTotal.append(info["thetaMax"])
                 logStr = f"Episode {episode} finished after {t} episodeRewardSum {episodeRewardSum:.2f} thetaMax {info['thetaMax']:.2f} learnRate {learningRate:.2f} exploreRate {explorationRate:.2f} streakLen {streaksNum}"
                 if logDebugFile:
@@ -175,9 +180,9 @@ def learnToSwing():
     plt.show()
 
 
-def actionSelect(state, explorationRate):
-    if state >= xAccNumBins:
-        return 0    
+def actionSelect(episode, state, explorationRate):
+    # if state >= xAccNumBins:
+    #     return 0    
     # The exploration rate determines the likelihood of taking a random
     # action vs the action with the best Q
     if random.random() < explorationRate:
@@ -188,10 +193,31 @@ def actionSelect(state, explorationRate):
         action = np.argmax(qTable[state])
     return action
 
-def actionSelectFix(state, explorationRate):
+def actionSelectFix(episode, state, explorationRate):
     if state == 4 or state == 13:
         return ACTION_KICK
     return ACTION_STRAIGHT
+
+# Permutations of actions
+def actionSelectPermute(episode, state, explorationRate):
+    return np.argmax(qTable[state])
+
+# This is a list of tables which represent the action to perform in a specific state
+# So each table is like a Q-Table except that it contains the action number for the best action
+# It is used to populate the Q-Table
+permuteUsedBinStart = 2
+permuteSecondDirectionBinEnd = xAccNumBins * 2 - permuteUsedBinStart - 1
+permuteUsedBinCount = 10
+permutationsTable = [perm for perm in itertools.product(range(numActions), repeat=permuteUsedBinCount)]
+def permuteTableSetup(episode):
+    for i, perm in enumerate(permutationsTable[episode % len(permutationsTable)]):
+        if i < permuteUsedBinCount // 2:
+            qTable[i+permuteUsedBinStart][1] = perm
+        else:
+            qTable[permuteSecondDirectionBinEnd-(i-permuteUsedBinCount // 2)][1] = perm
+
+def permutesDone(episode):
+    return episode > len(permutationsTable)
 
 def getExplorationRate(t):
     # Exploration rate is a log function reducing over time
@@ -201,6 +227,10 @@ def getLearningRate(t):
     # Learning rate is a log function reducing over time
     return max(LEARN_RATE_MIN, LEARN_RATE_MAX * (1.0 - math.log10(t/LEARN_RATE_DECAY_FACTOR+1)))
 
+# Sensing direction (using a moving average)
+obsList = []
+obsSum = 0
+obsWindowLen = 3
 def getObservationBinned(val, bins):
     global obsList, obsSum
     # Smooth the observations
@@ -214,7 +244,7 @@ def getObservationBinned(val, bins):
     obsList = obsList[-(obsWindowLen-1):]
     obsList.append(val)
     obsSum += val
-    discreteVal = np.digitize(obsSum/len(obsList), bins)
+    discreteVal = np.digitize(val, bins)
     if obsSum >= obsSumPrev:
         return discreteVal
     return xAccNumBins * 2 - 1 - discreteVal
@@ -286,7 +316,7 @@ def doRender(numStreaks):
             kickIndicators[i][j].set_color(rgbColour[0], rgbColour[1], rgbColour[2])
 
     env.render()
-    time.sleep(0.01)
+    time.sleep(.01)
 
 if __name__ == "__main__":
     learnToSwing()
