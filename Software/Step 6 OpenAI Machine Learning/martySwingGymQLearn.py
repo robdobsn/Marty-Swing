@@ -28,21 +28,23 @@ numDirections = 2
 qTable = np.zeros((xAccNumBins * numDirections, numActions))
 
 # Learning and exploration settings
-EXPLORATION_RATE_MAX = 0.7
+EXPLORATION_RATE_MAX = 0.4
 EXPLORATION_RATE_MIN = 0.01
-EXPLORATION_RATE_DECAY_FACTOR = 10
-LEARN_RATE_MAX = 1.0
+EXPLORATION_RATE_DECAY_FACTOR = 1
+LEARN_RATE_MAX = .4
 LEARN_RATE_MIN = 0.1
-LEARN_RATE_DECAY_FACTOR = 50
-DISCOUNT_FACTOR = 0.8
+LEARN_RATE_DECAY_FACTOR = 5
+DISCOUNT_FACTOR = 0.9
 
 # Goal and debug settings
 EPISODE_MAX = 500
 TIME_MAX = 1000
 STREAK_LEN_WHEN_DONE = 100
 REWARD_SUM_GOAL = 2500
-LOG_DEBUG = True
+LOG_DEBUG = False
 LOG_DEBUG_FILE = "testruns/martySwingQLearnLog.txt"
+SHOW_ALL_RENDERS = False
+RENDER_LAST = False
 
 # Debug
 learnRateVals = []
@@ -87,7 +89,7 @@ def learnToSwing():
         while True:
 
             # Check if we're close to done for debugging
-            if streaksNum > STREAK_LEN_WHEN_DONE - 1:
+            if SHOW_ALL_RENDERS or (RENDER_LAST and streaksNum == STREAK_LEN_WHEN_DONE-1):
                 env.render()
                 time.sleep(0.1)
 
