@@ -31,15 +31,15 @@ qTable = np.zeros((xAccNumBins * numDirections, numActions))
 EXPLORATION_RATE_MAX = 0.4
 EXPLORATION_RATE_MIN = 0.01
 EXPLORATION_RATE_DECAY_FACTOR = 1
-LEARN_RATE_MAX = .4
+LEARN_RATE_MAX = 1
 LEARN_RATE_MIN = 0.1
-LEARN_RATE_DECAY_FACTOR = 5
+LEARN_RATE_DECAY_FACTOR = 1
 DISCOUNT_FACTOR = 0.9
 
 # Goal and debug settings
 EPISODE_MAX = 500
 TIME_MAX = 1000
-STREAK_LEN_WHEN_DONE = 100
+STREAK_LEN_WHEN_DONE = 20
 REWARD_SUM_GOAL = 2500
 LOG_DEBUG = False
 LOG_DEBUG_FILE = "testruns/martySwingQLearnLog.txt"
@@ -156,9 +156,9 @@ def learnToSwing():
 
     print(dumpQTable(qTable))
     plt.plot(rewardTotal, 'p')
-    plt.show()
-    plt.plot(learnRateVals, 'g')
-    plt.plot(exploreRateVals, 'b')
+    plt.suptitle("Marty Swing Q-Learning", fontsize=20)
+    plt.ylabel('Total Reward', fontsize=16)
+    plt.xlabel('Training Episode', fontsize=16)
     plt.show()
 
 
